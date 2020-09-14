@@ -4,10 +4,16 @@
         tomcat_download_url: https://mirrors.estointernet.in/apache/tomcat/tomcat-9/v9.0.37/bin/apache-tomcat-9.0.37.tar.gz
         tomcat_download_directory: /opt
    tasks:
+     - name: Check if java rpm is already installed or not
+       yum:
+         list: java-1.8.0-openjdk
+         # If not installed yum_list.results[*].yumstate != installed
+       register: check_java_existence
      - name : Install java
        yum:
          name: java-1.8.0-openjdk
          state: present
+       when: check_java_existence.results | selectattr("yumstate", "match", "installed") | list | length == 0
      - name: Print variables
        debug:
          msg: "{{ tomcat_download_url }}"
